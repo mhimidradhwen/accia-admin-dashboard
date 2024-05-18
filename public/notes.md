@@ -6,19 +6,23 @@
    Suppression --> Ok
 
 2. Galerie
-   Ajout
-   Modification
-   Suppression
+   Ajout --> Ok
+   Modification --> Becem yraka7 fyha
+   Suppression --> Becem yraka7 fyha
 
 3. Membres
     verifier payement --> Becem yrakka7 fyha
     supprimer un membre --> Ok
 
 4. Publication
-   Modification
+   Modification --> Ok
 
-
-5. Graphs et Courbes
+5. Evenement
+   Ajout --> Ok
+   Modification --> Ok
+   Suppression --> Ok
+   Affichage --> Ok
+6. Graphs et Courbes
    Graphique des publications
    Graphique des membres
 

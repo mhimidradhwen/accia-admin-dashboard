@@ -55,7 +55,6 @@ const UpdatePostForm = ({ postID }) => {
 
       const headers = {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       };

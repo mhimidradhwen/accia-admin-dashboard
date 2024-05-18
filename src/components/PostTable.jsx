@@ -106,9 +106,6 @@ const deletePost = async(id)=>{
                 </TableCell>
                 <TableCell align="right">{row.user.firstName}</TableCell>
                 <TableCell align="center">
-                  {/* <IconButton aria-label="delete" color="primary">
-                    <CreateIcon />
-                  </IconButton>{" "} */}
                   <EditPostModal postID={row._id} />
                   <IconButton aria-label="delete" color="primary">
                     <DeleteIcon onClick={()=>{deletePost(row._id)}}/>

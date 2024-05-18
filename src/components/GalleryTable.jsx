@@ -9,20 +9,60 @@ import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CreateIcon from '@mui/icons-material/Create';
-
+import { SERVER_URL } from "../utils";
+import RefreshIcon from '@mui/icons-material/Refresh';
+import axios from "axios";
 function createData(title, date) {
   return { title, date };
 }
 
-const rows = [
-  createData("Album 1", "24/02/2024",),
-  createData("Album 2", "01/01/2024",),
-  createData("Album 3", "24/02/2024",),
-  createData("Album 4", "29/03/2024", ),
-];
+
 
 export default function GalleryTable() {
+  const [dataList, setDataList] = React.useState([]);
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        `${SERVER_URL}/api/admin/album`
+      );
+      setDataList(response.data); 
+      console.log(response.data);
+      console.log(response.data[0]);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+const token = localStorage.getItem("token");
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+const deletePost = async(id)=>{
+  try {
+    const response = await axios.delete(
+      `${SERVER_URL}/api/admin/post/${id}`,{headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },}
+    );
+    console.log(response.data);
+    fetchData();
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+  React.useEffect(() => {
+    
+    fetchData();
+  }, []); 
+
   return (
+    <div>
+       <IconButton aria-label="delete" color="primary" onClick={fetchData}>
+        <RefreshIcon />
+      </IconButton>
+
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
@@ -33,15 +73,15 @@ export default function GalleryTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {dataList.map((row) => (
             <TableRow
               key={row.title}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-            >
+              >
               <TableCell component="th" scope="row">
-                {row.title}
+                {row.folderName}
               </TableCell>
-              <TableCell align="right">{row.date}</TableCell>
+              <TableCell align="right">{row.createdAt}</TableCell>
               <TableCell align="center">
                 <IconButton aria-label="delete"  color="primary">
                   <CreateIcon />
@@ -54,5 +94,6 @@ export default function GalleryTable() {
         </TableBody>
       </Table>
     </TableContainer>
+          </div>
   );
 }

@@ -11,7 +11,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker, DatePickerToolbar } from "@mui/x-date-pickers/DatePicker";
 import { Alert, Button, Snackbar, TextField, Typography } from "@mui/material";
 import { DateTimePicker, TimePicker } from "@mui/x-date-pickers";
-import dayjs from "dayjs";
 import { useState } from "react";
 import axios from "axios";
 import { SERVER_URL } from "../utils";
@@ -27,7 +26,7 @@ const cancatenateDateandHour = (hour,date) => {
   return `${date}T${hour}:00`;
 }
 
-export default function EventForm() {
+export default function UpdateEventForm({eventId}) {
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
     clipPath: "inset(50%)",
@@ -55,6 +54,7 @@ export default function EventForm() {
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     console.log(e.target.value);
+      console.log(hourToTimestamp(hour,date));
     }
   };
 
@@ -62,30 +62,27 @@ export default function EventForm() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("title", formData.title_fr);
-      formDataToSend.append("folderName","Event");
-      formDataToSend.append("date", cancatenateDateandHour(formData.H_Start,formData.date));
-      formDataToSend.append("description", formData.description_fr);
-      formDataToSend.append("H_Start", cancatenateDateandHour(formData.H_Start,formData.date));
-      formDataToSend.append("H_Fin", cancatenateDateandHour(formData.H_End,formData.date));
-      formDataToSend.append("isVisible", true);
-      formDataToSend.append("Location", formData.location_fr);
-      formDataToSend.append("image", formData.image);
+      const formDataToSend = {
+        title: formData.title_fr,
+        date: cancatenateDateandHour(formData.H_Start,formData.date),
+        description: formData.description_fr,
+        H_Start: cancatenateDateandHour(formData.H_Start,formData.date),
+        H_Fin: cancatenateDateandHour(formData.H_End,formData.date),
+        location: formData.location_fr,
+      }
       console.log(formDataToSend);
       console.log(formData.H_start);
       const token = localStorage.getItem("token");
-      const response = await axios.post(
-        `${SERVER_URL}/api/admin/event`,
+      const response = await axios.put(
+        `${SERVER_URL}/api/admin/event/${eventId}`,
         formDataToSend,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      setAlert({ type: "success", message: "Post créé avec succès" });
+      setAlert({ type: "success", message: "Evenement modifié avec succès" });
       setIsLoading(false);
       setToastOpen(true);
       // Optionally, you can redirect the user or perform some other action upon successful post creation
@@ -181,25 +178,7 @@ export default function EventForm() {
             />{" "}
           </Grid>
 
-          <Grid item xs={6}>
-            <Button
-              component="label"
-              role={undefined}
-              fullWidth
-              size="large"
-              variant="outlined"
-              tabIndex={-1}
-              startIcon={<CloudUploadIcon />}
-            >
-              Ajouter une image{" "}
-              <VisuallyHiddenInput
-                type="file"
-                onChange={handleChange}
-                name="image"
-                accept="image/*"
-              />
-            </Button>{" "}
-          </Grid>
+         
           <Grid item xs={6}>
             <Button
               variant="contained"
@@ -208,7 +187,7 @@ export default function EventForm() {
               size="large"
               endIcon={<SendIcon />}
             >
-              Ajouter
+              Modifier
             </Button>
           </Grid>
         </Grid>

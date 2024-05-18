@@ -13,6 +13,7 @@ import axios from "axios";
 import { SERVER_URL } from "../utils";
 import { Alert, Button, FormControlLabel, Radio, RadioGroup, TextField } from "@mui/material";
 import { BounceLoader } from "react-spinners";
+import LoadingButton from "./LoadingButton";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -185,7 +186,6 @@ export default function DocForm() {
             )}
             {!isLoading && (
               
-           
           <Button
             variant="contained"
             fullWidth
@@ -194,8 +194,9 @@ export default function DocForm() {
             endIcon={<SendIcon />}
           >
             Ajouter
-          </Button>
+          </Button> 
            )}
+
         </Grid>
       </Grid>
     </Box>
