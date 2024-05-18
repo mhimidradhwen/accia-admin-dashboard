@@ -8,20 +8,30 @@ import {
   Grid,
   Radio,
   RadioGroup,
+  Snackbar,
   TextField,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SendIcon from "@mui/icons-material/Send";
+import { SERVER_URL } from "../utils";
+import { BounceLoader } from "react-spinners";
 
 const NewPostForm = () => {
   const [formData, setFormData] = useState({
     image: null, // For file upload
   });
 
-  const [alert, setAlert] = useState(null);
-
+  const [alert, setAlert] = useState({type: null, message: null});
+  const [isLoading, setIsLoading] = useState(false);
+  const [color, setColor] = useState("#ffffff");
+  const [toastOpen, setToastOpen] = useState(false);
+  const override = {
+    display: "block",
+    margin: "0 auto",
+    borderColor: "red",
+  };
   const handleChange = (e) => {
     if (e.target.type === "file") {
       setFormData({ ...formData, [e.target.name]: e.target.files[0] });
@@ -32,7 +42,7 @@ const NewPostForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setIsLoading(true);
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("title_ar", formData.title_ar);
@@ -43,11 +53,11 @@ const NewPostForm = () => {
       formDataToSend.append("description_eng", formData.description_eng);
       formDataToSend.append("isVisible", formData.isVisible);
       formDataToSend.append("image", formData.image);
-      console.log(formDataToSend)
+      console.log(formDataToSend);
 
-      const token ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MWIyZDJlMTEwNTJmOGU3NmUwNWRhYSIsImlzQWRtaW4iOnRydWUsImVtYWlsIjoicmFkaHdlbkBlbWFpbC5jb20iLCJpYXQiOjE3MTM2NjMyMzgsImV4cCI6MTcxMzY2ODYzOH0.zR9CPaV7dtcfTEmBEerlvF2x2Cy-P2os524ettlgNg0"
+      const token = localStorage.getItem("token");
       const response = await axios.post(
-        "https://acca-backend-1.onrender.com/api/admin/post",
+        `${SERVER_URL}/api/admin/post`,
         formDataToSend,
         {
           headers: {
@@ -56,18 +66,19 @@ const NewPostForm = () => {
           },
         }
       );
-      setAlert({ type: "success", message: "Post created successfully" });
-
-      console.log("Post created:", response.data);
-      console.log(formDataToSend)
+      setAlert({ type: "success", message: "Post créé avec succès" });
+      setIsLoading(false);
+      setToastOpen(true);
       // Optionally, you can redirect the user or perform some other action upon successful post creation
     } catch (error) {
+      setIsLoading(false);
+      setToastOpen(true);
       setAlert({
         type: "error",
-        message: `fix this ${error.response.data.message}`,
+        message: `Erreur ${error.response.data.message}`,
       });
 
-      console.error("Error creating post:", error);
+      console.error("Erreur lors de la création du post:", error);
     }
   };
 
@@ -85,88 +96,16 @@ const NewPostForm = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      {alert && (
-        <Alert
-          variant="filled"
-          severity={alert.type}
-          onClose={() => {
-            setAlert(null);
-          }}
-        >
-          {alert.message}{" "}
-        </Alert>
-      )}
-
-      {/* <label htmlFor="title_ar">Title AR:</label>
-      <input
-        type="text"
-        id="title_ar"
-        name="title_ar"
-        value={formData.title_ar}
-        onChange={handleChange}
-      />
-
-      <label htmlFor="description">Description AR:</label>
-      <textarea
-        id="description_ar"
-        name="description_ar"
-        value={formData.description_ar}
-        onChange={handleChange}
-      ></textarea>
-
-      <label htmlFor="title_fr">Title FR:</label>
-      <input
-        type="text"
-        id="title_fr"
-        name="title_fr"
-        value={formData.title_fr}
-        onChange={handleChange}
-      />
-
-      <label htmlFor="description_fr">Description FR:</label>
-      <textarea
-        id="description_fr"
-        name="description_fr"
-        value={formData.description_fr}
-        onChange={handleChange}
-      ></textarea>
-
-      <label htmlFor="title_eng">Title EN:</label>
-      <input
-        type="text"
-        id="title_eng"
-        name="title_eng"
-        value={formData.title_eng}
-        onChange={handleChange}
-      />
-
-      <label htmlFor="description_eng">Description EN:</label>
-      <textarea
-        id="description_eng"
-        name="description_eng"
-        value={formData.description_eng}
-        onChange={handleChange}
-      ></textarea>
-
-      <label htmlFor="visible">Description EN:</label>
-      <textarea
-        id="visible"
-        name="isVisible"
-        value={formData.isVisible}
-        onChange={handleChange}
-      ></textarea>
-
-      <label htmlFor="image">Image:</label>
-      <input
-        type="file"
-        id="image"
-        name="image"
-        accept="image/*"
-        onChange={handleChange}
-      />
-
-      <button type="submit">Submit</button> */}
-
+     
+  <Snackbar
+        open={toastOpen}
+        color="red"
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        autoHideDuration={3000}
+        onClose={() => setToastOpen(false)}
+      >
+        <Alert severity={alert.type}>{alert.message}</Alert>
+      </Snackbar>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2}>
           <Grid item xs={6}>
@@ -259,7 +198,6 @@ const NewPostForm = () => {
                 onChange={handleChange}
                 control={<Radio />}
                 name="isVisible"
-
                 label="Publique"
               />
               <FormControlLabel
@@ -267,7 +205,6 @@ const NewPostForm = () => {
                 onChange={handleChange}
                 control={<Radio />}
                 name="isVisible"
-
                 label="Privée"
               />
             </RadioGroup>
@@ -288,15 +225,21 @@ const NewPostForm = () => {
             </Button>{" "}
           </Grid>
           <Grid item xs={6}>
-            <Button
-              variant="contained"
-              type="submit"
-              fullWidth
-              size="large"
-              endIcon={<SendIcon />}
-            >
-              Ajouter
-            </Button>
+            {isLoading && (
+              <BounceLoader color="#36d7b7" cssOverride={override} />
+            )}
+            {!isLoading && (
+              <Button
+                variant="contained"
+                type="submit"
+                fullWidth
+                size="large"
+                
+                endIcon={<SendIcon />}
+              >
+                Ajouter
+              </Button>
+            )}
           </Grid>
         </Grid>
       </Box>

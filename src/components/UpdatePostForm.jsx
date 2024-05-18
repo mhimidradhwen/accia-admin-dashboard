@@ -14,6 +14,7 @@ import { styled } from "@mui/material/styles";
 
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import SendIcon from "@mui/icons-material/Send";
+import { SERVER_URL } from "../utils";
 
 const UpdatePostForm = ({ postID }) => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const UpdatePostForm = ({ postID }) => {
     title_eng: "",
     description_eng: "",
     isVisible: "true",
-    image: null, 
+    image: null,
   });
 
   const [alert, setAlert] = useState(null);
@@ -33,8 +34,6 @@ const UpdatePostForm = ({ postID }) => {
     if (e.target.type === "file") {
       setFormData({ ...formData, image: e.target.files[0] });
     } else {
-        console.log(e.target.value )
-        console.log(e.target.name )
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
   };
@@ -43,37 +42,39 @@ const UpdatePostForm = ({ postID }) => {
     e.preventDefault();
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("title_ar", formData.title_ar);
-      console.log(formData)
-      formDataToSend.append("description_ar", formData.description_ar);
-      formDataToSend.append("title_fr", formData.title_fr);
-      formDataToSend.append("description_fr", formData.description_fr);
-      formDataToSend.append("title_eng", formData.title_eng);
-      formDataToSend.append("description_eng", formData.description_eng);
-      formDataToSend.append("isVisible", formData.isVisible);
-      formDataToSend.append("image", formData.image);
+      const formDataToSend = {
+        title_ar: formData.title_ar,
+        title_fr: formData.title_fr,
+        title_eng: formData.title_eng,
+        description_ar: formData.description_ar,
+        description_fr: formData.description_fr,
+        description_eng: formData.description_eng,
+        isVisible: formData.isVisible,
+      };
+      const token = localStorage.getItem("token");
 
-const token ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MWIyZDJlMTEwNTJmOGU3NmUwNWRhYSIsImlzQWRtaW4iOnRydWUsImVtYWlsIjoicmFkaHdlbkBlbWFpbC5jb20iLCJpYXQiOjE3MTM2NjkxNjQsImV4cCI6MTcxMzY3NDU2NH0.Dx2FvlIAha_oQirCtxNcb2ycvGe3-DM1PE9cjuq0j2c"
-      const response = await axios.put(
-        `https://acca-backend-1.onrender.com/api/admin/post/${postID}`,
-        formData.description_ar,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setAlert({ type: "success", message: "Post updated successfully" });
+      const headers = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      const response = await axios
+        .put(
+          `${SERVER_URL}/api/admin/post/${postID}`,
+          formDataToSend,
+          headers
+        )
+        .then(
+          setAlert({ type: "success", message: "Post updated successfully" })
+        );
 
       console.log("Post updated:", response.data);
       console.log(formDataToSend);
-      // Optionally, you can redirect the user or perform some other action upon successful post creation
     } catch (error) {
       setAlert({
         type: "error",
-        message: `fix this ${error.response.data.message}`,
+        message: `fix this ${error}`,
       });
 
       console.error("Error updating post:", error);
@@ -206,27 +207,9 @@ const token ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MWIyZDJlMTEwNTJmO
               />
             </RadioGroup>
           </Grid>
+
           <Grid item xs={6}>
-            <Button
-              component="label"
-              role={undefined}
-              fullWidth
-              size="large"
-              variant="outlined"
-              tabIndex={-1}
-              startIcon={<CloudUploadIcon />}
-            >
-              Ajouter une image{" "}
-              <VisuallyHiddenInput type="file" name="image" accept="image/*" />
-            </Button>{" "}
-          </Grid>
-          <Grid item xs={6}>
-            <Button
-              variant="contained"
-              type="submit"
-              fullWidth
-              size="large"
-            >
+            <Button variant="contained" type="submit" fullWidth size="large">
               Modifier
             </Button>
           </Grid>

@@ -14,13 +14,15 @@ import axios from "axios";
 import { useState } from "react";
 import { useEffect } from "react";
 import EditPostModal from "./EditPostModal";
+import { SERVER_URL } from "../utils";
+
 
 export default function PostTable() {
   const [dataList, setDataList] = useState([]);
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "https://acca-backend-1.onrender.com/api/admin/post"
+        `${SERVER_URL}/api/admin/post`
       );
       setDataList(response.data); 
       console.log(response.data);
@@ -29,7 +31,7 @@ export default function PostTable() {
       console.error("Error fetching data:", error);
     }
   };
-  const token ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2MWIyZDJlMTEwNTJmOGU3NmUwNWRhYSIsImlzQWRtaW4iOnRydWUsImVtYWlsIjoicmFkaHdlbkBlbWFpbC5jb20iLCJpYXQiOjE3MTM2NjMyMzgsImV4cCI6MTcxMzY2ODYzOH0.zR9CPaV7dtcfTEmBEerlvF2x2Cy-P2os524ettlgNg0"
+const token = localStorage.getItem("token");
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -38,12 +40,13 @@ export default function PostTable() {
 const deletePost = async(id)=>{
   try {
     const response = await axios.delete(
-      `https://acca-backend-1.onrender.com/api/admin/post/${id}`,{headers: {
+      `${SERVER_URL}/api/admin/post/${id}`,{headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`,
       },}
     );
     console.log(response.data);
+    fetchData();
   } catch (error) {
     console.error("Error fetching data:", error);
   }

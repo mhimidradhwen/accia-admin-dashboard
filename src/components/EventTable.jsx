@@ -10,19 +10,38 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CreateIcon from '@mui/icons-material/Create';
 
-function createData(title, date, hour , localisation) {
-  return { title, date, hour, localisation };
-}
 
-const rows = [
-  createData("Evenement 1", "24/02/2024", "17h00", "Bizerte"),
-  createData("Evenement 2", "01/01/2024", "13h00", "Hammamet"),
-  createData("Evenement 3", "24/02/2024", "21h00", "Tunis"),
-  createData("Evenement 4", "29/03/2024", "21h00", "Bizerte"),
-];
 
 export default function EventTable() {
+
+const [events, setEvents] = React.useState([]);
+const fetchData = async () => {
+  try {
+    const response = await axios.get(
+      `${SERVER_URL}/api/admin/events`
+    );
+    setEvents(response.data); 
+    console.log(response.data);
+    console.log(response.data[0]);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+const token = localStorage.getItem("token");
+const config = {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+};
+React.useEffect(()=>{
+  fetchData();
+}, [])
   return (
+    <div>
+
+    <IconButton aria-label="delete" color="primary" onClick={fetchData}>
+    <RefreshIcon />
+  </IconButton>
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
@@ -35,17 +54,17 @@ export default function EventTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {events.map((event) => (
             <TableRow
-              key={row.title}
+              key={event.title}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell component="th" scope="row">
-                {row.title}
+                {event.title}
               </TableCell>
-              <TableCell align="right">{row.date}</TableCell>
-              <TableCell align="right">{row.hour}</TableCell>
-              <TableCell align="right">{row.localisation}</TableCell>
+              <TableCell align="right">{event.date}</TableCell>
+              <TableCell align="right">{event.hour}</TableCell>
+              <TableCell align="right">{event.localisation}</TableCell>
               <TableCell align="center">
                 <IconButton aria-label="delete"  color="primary">
                   <CreateIcon />
@@ -58,5 +77,6 @@ export default function EventTable() {
         </TableBody>
       </Table>
     </TableContainer>
+    </div>
   );
 }

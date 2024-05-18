@@ -13,9 +13,7 @@ function Members() {
         <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
       
           <h3>Tous Les Membres</h3>
-          <Button variant="contained" sx={{mt:3,mb:3}} fullWidth startIcon={<BackupTableIcon />}>
-      Exporter en CSV
-      </Button>
+       
           <MembersTable />
         </Box>
       </Box>
